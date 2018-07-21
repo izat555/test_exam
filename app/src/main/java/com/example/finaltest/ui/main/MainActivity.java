@@ -1,9 +1,10 @@
 package com.example.finaltest.ui.main;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -18,6 +19,7 @@ import com.example.finaltest.ui.first.FirstFragment;
 public class MainActivity extends AppCompatActivity {
     private EditText mEtText;
     private TextView mTvText;
+    private Fragment mFirstFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,21 +30,19 @@ public class MainActivity extends AppCompatActivity {
         mEtText.addTextChangedListener(mTextWatcher);
         mTvText = findViewById(R.id.tv_text);
 
-        if (savedInstanceState != null) {
-            String text  = savedInstanceState.getString(getString(R.string.text));
-            mEtText.setText(text);
-
-            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-            if (currentFragment != null) {
-                getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+        if (mFirstFragment == null) {
+            mFirstFragment = new FirstFragment();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .add(R.id.fragment_container, mFirstFragment)
+                    .commit();
+        } else {
+            if (savedInstanceState != null) {
+                String text  = savedInstanceState.getString(getString(R.string.text));
+                mEtText.setText(text);
             }
         }
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .add(R.id.fragment_container, new FirstFragment())
-                .commit();
     }
 
     @Override
@@ -53,7 +53,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+
+                break;
+            case R.id.action_last_list:
+                Intent intent = new Intent("my.intent.action.show");
+                intent.putExtra(getString(R.string.text), "");
+                startActivity(intent);
+                break;
+        }
+        return true;
     }
 
     private TextWatcher mTextWatcher = new TextWatcher() {

@@ -41,11 +41,11 @@ public class FirstFragment extends Fragment {
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-
         if (savedInstanceState != null) {
             mEtText.setText(savedInstanceState.getString(getContext().getString(R.string.text)));
+
         }
+        super.onViewStateRestored(savedInstanceState);
     }
 
     private TextWatcher mTextWatcher = new TextWatcher() {

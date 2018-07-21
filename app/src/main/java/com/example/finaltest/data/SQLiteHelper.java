@@ -17,8 +17,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String CHARACTER = "CHARACTER";
 
     private static final String CREATE_TABLE
-            = String.format("CREATE TABLE IF NOT EXISTS %s(%s INTEGER_PRIMARY_KEY, %s TEXT);"
-            , TABLE_NAME, ID, CHARACTER);
+            = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "("
+            + ID + " INTEGER_PRIMARY_KEY, "
+            + CHARACTER + " TEXT);";
 
     public SQLiteHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -43,7 +44,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                savedChars.add(cursor.getString(cursor.getColumnIndex(CHARACTER)).toCharArray()[0]);
+                String strChar = cursor.getString(cursor.getColumnIndex(CHARACTER));
+                savedChars.add(strChar.charAt(0));
             } while (cursor.moveToNext());
         }
 
@@ -53,16 +55,26 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return savedChars;
     }
 
-    public void saveChars(ArrayList<Character> chars) {
+    public long saveChars(ArrayList<Character> chars) {
+        deleteChars();
         SQLiteDatabase database = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
+        long rowInserted = 0;
 
         for (int i = 0; i < chars.size(); i++) {
             contentValues.put(ID, i);
             contentValues.put(CHARACTER, String.valueOf(chars.get(i)));
-            database.insert(TABLE_NAME, null, contentValues);
+            rowInserted = database.insert(TABLE_NAME, null, contentValues);
         }
 
         database.close();
+        return rowInserted;
+    }
+
+    private int deleteChars() {
+        SQLiteDatabase database = getWritableDatabase();
+        int countDeleted = database.delete(TABLE_NAME, null, null);
+        database.close();
+        return countDeleted;
     }
 }
