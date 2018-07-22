@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.finaltest.R;
-import com.example.finaltest.config.AppConstants;
 
 public class FirstFragment extends Fragment {
     private EditText mEtText;
@@ -25,6 +25,7 @@ public class FirstFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(getContext().getString(R.string.my_log), "onCreateView");
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         mEtText = view.findViewById(R.id.et_text);
         mTvText = view.findViewById(R.id.tv_text);
@@ -34,6 +35,7 @@ public class FirstFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.d(getContext().getString(R.string.my_log), "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         mEtText.addTextChangedListener(mTextWatcher);
         mBtnGo.setOnClickListener(mOnClickListener);
@@ -41,11 +43,19 @@ public class FirstFragment extends Fragment {
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        Log.d(getContext().getString(R.string.my_log), "onViewStateRestored");
         if (savedInstanceState != null) {
             mEtText.setText(savedInstanceState.getString(getContext().getString(R.string.text)));
 
         }
         super.onViewStateRestored(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(getContext().getString(R.string.my_log), "onSaveInstanceState");
+        outState.putString(getContext().getString(R.string.text), mEtText.getText().toString());
     }
 
     private TextWatcher mTextWatcher = new TextWatcher() {
@@ -61,19 +71,9 @@ public class FirstFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable s) {
-            if (s.length() == AppConstants.MAX_TEXT_SIZE) {
-                s.delete(s.length() - 1, s.length());
-            } else {
-                mTvText.setText(s.toString());
-            }
+            mTvText.setText(s.toString());
         }
     };
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(getContext().getString(R.string.text), mEtText.getText().toString());
-    }
 
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override

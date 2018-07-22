@@ -3,7 +3,6 @@ package com.example.finaltest.ui.main;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,7 +12,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.finaltest.R;
-import com.example.finaltest.config.AppConstants;
 import com.example.finaltest.ui.first.FirstFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,22 +25,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mEtText = findViewById(R.id.et_text);
-        mEtText.addTextChangedListener(mTextWatcher);
         mTvText = findViewById(R.id.tv_text);
 
-        if (mFirstFragment == null) {
-            mFirstFragment = new FirstFragment();
+        mEtText.addTextChangedListener(mTextWatcher);
+
+        if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .add(R.id.fragment_container, mFirstFragment)
+                    .add(R.id.fragment_container, new FirstFragment())
                     .commit();
-        } else {
-            if (savedInstanceState != null) {
-                String text  = savedInstanceState.getString(getString(R.string.text));
-                mEtText.setText(text);
-            }
         }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            mEtText.setText(savedInstanceState.getString(getString(R.string.text)));
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(getString(R.string.text), mEtText.getText().toString());
     }
 
     @Override
@@ -79,17 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void afterTextChanged(Editable s) {
-            if (s.length() == AppConstants.MAX_TEXT_SIZE) {
-                s.delete(s.length() - 1, s.length());
-            } else {
-                mTvText.setText(s.toString());
-            }
+            mTvText.setText(s.toString());
         }
     };
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(getString(R.string.text), mEtText.getText().toString());
-    }
 }
